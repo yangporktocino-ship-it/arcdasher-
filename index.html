@@ -473,7 +473,7 @@
   // 1) Sa Supabase dashboard: Settings > API, kunin ang "Project URL" at "anon public" key.
   // 2) Palitan ang dalawang value sa ibaba.
   const SUPABASE_URL = 'https://pdgouxrovvikqbqqacnp.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_Ln7jLg3v0aZm17ARaVCLJg_1EgZ5qPC';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkZ291eHJvdnZpa3FicXFhY25wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1MjgyNjQsImV4cCI6MjEwNTEwNDI2NH0.FyV7sgWnIY9r2mUfNvgJolGAeUARKVNHjLCSNE2I-PI';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const completed = {2:false, 3:false, 4:false, 5:false};
@@ -534,7 +534,7 @@
     if(error){
       submitBtn.textContent = 'Submit';
       submitBtn.disabled = false;
-      status.textContent = 'May problem sa pag-submit. Subukan ulit.';
+      status.textContent = 'Something went wrong submitting. Please try again.';
       status.style.color = '#ff8a3d';
       console.error(error);
       return;
