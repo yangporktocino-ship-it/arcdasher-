@@ -227,6 +227,22 @@
   .step-note{font-size:11px; color:var(--muted); margin-top:10px;}
   .form-status{margin-top:24px; font-size:14px; color:var(--accent); font-family:'Press Start 2P', monospace; line-height:1.8;}
 
+  /* future rewards */
+  .rewards-grid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:3px;
+    background:#000; box-shadow:5px 5px 0 #000;
+  }
+  .reward-card{background:var(--panel); padding:26px 22px;}
+  .reward-card .emoji{font-size:26px; display:block; margin-bottom:14px;}
+  .reward-card h4{font-family:'Press Start 2P', monospace; font-size:12px; line-height:1.6; margin-bottom:10px; color:var(--ink);}
+  .reward-card p{color:var(--muted); font-size:13px; line-height:1.6;}
+  .rewards-note{color:var(--muted); font-size:12px; margin-top:20px; max-width:60ch;}
+  .reward-card:last-child{grid-column:span 2;}
+  @media (max-width:640px){
+    .rewards-grid{grid-template-columns:1fr;}
+    .reward-card:last-child{grid-column:span 1;}
+  }
+
   /* gallery mosaic — 3x3 grid, one rounded card, subtle crossfade per cell */
   .gallery-mosaic{
     display:grid; grid-template-columns:repeat(3,1fr);
@@ -296,7 +312,13 @@
   }
   @media (max-width:520px){
     .steps{grid-template-columns:1fr;}
-    .cta{padding:36px 24px;}
+    .cta{padding:36px 24px; flex-direction:column; align-items:flex-start;}
+    section{padding:52px 0;}
+    .hero{padding:20px 24px 56px !important;}
+    .wrap{padding:0 20px;}
+    header{padding:20px;}
+    .section-head{margin-bottom:32px;}
+    .card-frame{padding:14px;}
   }
 
   :focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
@@ -451,6 +473,45 @@
   </section>
 </div>
 
+<div class="divider"></div>
+
+<div class="wrap" id="rewards">
+  <section>
+    <div class="section-head">
+      <h2>Future rewards</h2>
+      <p>The race doesn't end at the mint. Arc Dashers are built with the future in mind — as the community grows, holders may unlock access to future rewards, community activations, and ecosystem opportunities.</p>
+    </div>
+    <div class="rewards-grid">
+      <div class="reward-card">
+        <span class="emoji">🪙</span>
+        <h4>Future Token Rewards</h4>
+        <p>Potential eligibility for future token-related rewards.</p>
+      </div>
+      <div class="reward-card">
+        <span class="emoji">🎁</span>
+        <h4>Holder Rewards</h4>
+        <p>Exclusive rewards and drops for eligible holders.</p>
+      </div>
+      <div class="reward-card">
+        <span class="emoji">🏁</span>
+        <h4>Early Access</h4>
+        <p>Priority access to future Arc Dashers releases and activations.</p>
+      </div>
+      <div class="reward-card">
+        <span class="emoji">⚡</span>
+        <h4>Community Missions</h4>
+        <p>Participate in future challenges and earn potential rewards.</p>
+      </div>
+      <div class="reward-card">
+        <span class="emoji">👑</span>
+        <h4>Genesis Holder Benefits</h4>
+        <p>Additional utility tied to being an early Dasher.</p>
+      </div>
+    </div>
+    <p class="rewards-note">Potential holder benefits — final utility, eligibility, and reward mechanics will be announced closer to launch.</p>
+  </section>
+</div>
+
 <div class="wrap" id="apply">
   <section>
     <div class="cta">
@@ -474,7 +535,16 @@
   // 2) Palitan ang dalawang value sa ibaba.
   const SUPABASE_URL = 'https://pdgouxrovvikqbqqacnp.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkZ291eHJvdnZpa3FicXFhY25wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1MjgyNjQsImV4cCI6MjEwNTEwNDI2NH0.FyV7sgWnIY9r2mUfNvgJolGAeUARKVNHjLCSNE2I-PI';
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let supabaseClient = null;
+  try {
+    if (window.supabase && typeof window.supabase.createClient === 'function') {
+      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } else {
+      console.warn('Supabase library did not load — whitelist submissions will not be saved.');
+    }
+  } catch (err) {
+    console.warn('Supabase init failed — continuing without it.', err);
+  }
 
   const completed = {2:false, 3:false, 4:false, 5:false};
 
@@ -526,6 +596,14 @@
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.textContent = 'Submitting...';
     submitBtn.disabled = true;
+
+    if (!supabaseClient) {
+      submitBtn.textContent = 'Submit';
+      submitBtn.disabled = false;
+      status.textContent = 'Submissions are temporarily unavailable. Please try again in a moment.';
+      status.style.color = '#ff8a3d';
+      return;
+    }
 
     const { error } = await supabaseClient
       .from('whitelist')
